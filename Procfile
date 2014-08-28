@@ -1,0 +1,2 @@
+zookeeper: /Users/phil/Development/zookeeper-3.4.6/bin/zkServer.sh start-foreground /Users/phil/Development/zookeeper-3.4.6/conf/zoo_sample.cfg
+kafka: /Users/phil/Development/kafka_2.10-0.8.1.1/bin/kafka-server-start.sh /Users/phil/Development/kafka_2.10-0.8.1.1/config/server.properties
