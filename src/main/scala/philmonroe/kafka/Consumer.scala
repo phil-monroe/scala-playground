@@ -1,31 +1,30 @@
 package philmonroe.kafka
 
+import java.util.concurrent.Executors
+
 import kafka.message.MessageAndMetadata
 import kafka.serializer.StringDecoder
 import org.apache.log4j.Logger
 
-import scala.collection.mutable
-import scala.util.Try
-
 import scala.concurrent._
-import ExecutionContext.Implicits.global
 
-class Consumer(topic: String, topicThreads: Int = 1) {
-  val LOG = Logger.getLogger(this.getClass)
+class Consumer(topic: String, topicThreads: Int = 1)(callback: (MessageAndMetadata[String, String]) => Unit) {
+  private val LOG = Logger.getLogger(this.getClass)
 
-  val consumer = kafka.consumer.Consumer.create(KafkaProperties.consumerConfig)
-  val topicCountMap = Map(topic -> topicThreads)
-  val decoder = new StringDecoder()
-  val consumerMap = consumer.createMessageStreams(topicCountMap, decoder, decoder)
-  val messageQueue = new mutable.Queue[MessageAndMetadata[String, String]]()
+  implicit private val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(topicThreads))
+
+  private val consumer = kafka.consumer.Consumer.create(KafkaProperties.consumerConfig)
+  private val topicCountMap = Map(topic -> topicThreads)
+  private val decoder = new StringDecoder()
+  private val consumerMap = consumer.createMessageStreams(topicCountMap, decoder, decoder)
 
   consumerMap.get(topic).get.foreach { stream =>
     future {
       val iter = stream.iterator()
-      while (true) {
+      while (true)
         if (iter.hasNext())
-          messageQueue.enqueue(iter.next())
-      }
+          callback(iter.next())
+
     } onComplete { res =>
       LOG.error("FINISHED PULLING FROM KAFKA")
     }
@@ -33,7 +32,5 @@ class Consumer(topic: String, topicThreads: Int = 1) {
 
 
   def stop() = consumer.shutdown()
-
-  def fetch() = Try(messageQueue.dequeue())
 
 }
