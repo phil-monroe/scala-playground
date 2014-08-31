@@ -11,6 +11,8 @@ object KafkaTest extends App {
   // Force consumption from beginning
   //  ZkUtils.maybeDeletePath(KafkaProperties.zkConnect, "/consumers/" + KafkaProperties.groupId)
 
+  var run = true
+
   val producer = new Producer
   val consumer = new Consumer(KafkaProperties.topic)(msg =>
     LOG.info(s"fetched:  ${msg.partition} ${msg.offset} ${msg.key} ${msg.message}")
@@ -18,16 +20,17 @@ object KafkaTest extends App {
 
 
   // Continuously push to kafka
-  future {
-    while (true) {
-      Thread.sleep(100)
-      producer.send(KafkaProperties.topic, s"time: ${System.currentTimeMillis()}")
+  (0 to 10).foreach { i =>
+    future {
+      while (run)
+        producer.send(KafkaProperties.topic, s"time: ${System.currentTimeMillis()}")
     }
   }
 
 
   // Shutdown Gracefully
   sys.addShutdownHook {
+    run = false
     consumer.stop()
     producer.stop()
   }
