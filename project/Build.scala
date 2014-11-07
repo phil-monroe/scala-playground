@@ -26,9 +26,17 @@ object Build extends sbt.Build {
 
   lazy val scalaFinagle = Project("scala-finagle", file("scala-finagle"),
     settings = Seq(
-    fullResolvers := TaskKey[Seq[Resolver]]("full-resolvers", "my full"),
       libraryDependencies ++= Seq(
         "com.twitter" % "finagle-http_2.10" % "6.20.0"
+      )
+    )
+  )
+
+  lazy val scalaCurator = Project("scala-curator", file("scala-curator"),
+    settings = Seq(
+      libraryDependencies ++= Seq(
+        "org.apache.curator" % "curator-framework" % "2.6.0",
+        "org.slf4j" % "slf4j-log4j12" % "1.7.7"
       )
     )
   )
