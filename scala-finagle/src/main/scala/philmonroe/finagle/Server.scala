@@ -12,19 +12,11 @@ object Server extends App {
   val service = new Service[HttpRequest, HttpResponse] {
     def apply(req: HttpRequest): Future[HttpResponse] =
       Future.value {
-        Thread.sleep(100)
+//        Thread.sleep(100)
 
         new DefaultHttpResponse(req.getProtocolVersion, HttpResponseStatus.OK)
       }
   }
-
-  val timer = future {
-    while (true) {
-      println(System.currentTimeMillis())
-      Thread.sleep(1000)
-    }
-  }
-
 
   val server = Http.serve(":8080", service)
   Await.ready(server)

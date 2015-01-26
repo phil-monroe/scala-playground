@@ -15,7 +15,7 @@ object PingResource {
 
   @GET
   def ping() = {
-    Thread.sleep(100)
+//    Thread.sleep(100)
     "pong"
   }
 }

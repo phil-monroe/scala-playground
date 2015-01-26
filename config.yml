@@ -1,0 +1,6 @@
+server:
+  requestLog:
+    appenders: []
+  applicationConnectors:
+    - type: http
+      port: 8080
